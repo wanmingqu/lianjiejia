@@ -611,8 +611,43 @@ async def chat_agent(
                             msg_dict = msg.model_dump()
                             yield make_chunk(msg=msg_dict, metadata=metadata, status="complete")
                     
-                    # 保存消息到历史记录
+                    # 检查内容安全
+                    if (
+                        conf.enable_content_guard
+                        and hasattr(full_msg, "content")
+                        and await content_guard.check(full_msg.content)
+                    ):
+                        logger.warning("Sensitive content detected in non-stream mode")
+                        await save_partial_message(conv_manager, thread_id, full_msg, "content_guard_blocked")
+                        meta["time_cost"] = asyncio.get_event_loop().time() - start_time
+                        yield make_chunk(status="interrupted", message="检测到敏感内容，已中断输出", meta=meta)
+                        return
+
+                    # Check for human approval interrupts
+                    async for chunk in check_and_handle_interrupts(agent, langgraph_config, make_chunk, meta, thread_id):
+                        yield chunk
+
                     meta["time_cost"] = asyncio.get_event_loop().time() - start_time
+                    try:
+                        graph = await agent.get_graph()
+                        state = await graph.aget_state(langgraph_config)
+                        agent_state = _extract_agent_state(getattr(state, "values", {})) if state else {}
+                    except Exception:
+                        agent_state = {}
+
+                    if agent_state:
+                        yield make_chunk(status="agent_state", agent_state=agent_state, meta=meta)
+
+                    # 发送完成状态
+                    yield make_chunk(status="finished", meta=meta)
+                    
+                    # 保存消息到历史记录
+                    await save_messages_from_langgraph_state(
+                        agent_instance=agent,
+                        thread_id=thread_id,
+                        conv_mgr=conv_manager,
+                        config_dict=langgraph_config,
+                    )
                     return
                 
                 # 默认流式处理

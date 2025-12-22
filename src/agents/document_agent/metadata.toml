@@ -1,0 +1,27 @@
+[agent]
+name = "DocumentAgent"
+description = "专业的文档撰写Agent，具备知识库选择功能，能够基于知识库内容生成高质量文档"
+version = "1.0.0"
+category = "writing"
+
+[agent.capabilities]
+"文档生成" = "支持多种类型文档的智能生成，包括报告、手册、指南等"
+"知识库集成" = "集成知识库内容，确保生成内容的准确性和权威性"
+"模板管理" = "提供多种文档模板，支持自定义模板"
+"格式化输出" = "支持Markdown、HTML等多种输出格式"
+"内容优化" = "基于知识库内容进行智能优化和增强"
+
+[agent.dependencies]
+langchain = "^0.1.0"
+langchain-core = "^0.1.0"
+
+[agent.settings]
+default_streaming = false
+max_context_length = 8000
+temperature = 0.3
+max_tokens = 4000
+
+[agent.ui]
+icon = "file-text"
+color = "#4CAF50"
+category = "文档工具"

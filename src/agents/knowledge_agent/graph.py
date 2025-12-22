@@ -15,10 +15,10 @@ from .context import Context
 from .tools import get_tools
 
 
-class HtspAgent(BaseAgent):
-    name = "合同审批助手"
-    description = "专门用于合同审批流程的智能助手，支持合同审核、风险评估、条款检查等功能。"
-    capabilities = ["file_upload"]  # 支持文件上传功能
+class KnowledgeAgent(BaseAgent):
+    name = "知识库查询助手"
+    description = "专门用于查询公司内部知识库的智能助手，支持政策制度、员工手册、流程规范、业务知识等信息查询。"
+    capabilities = ["search", "document_retrieval"]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -27,7 +27,7 @@ class HtspAgent(BaseAgent):
         self.context_schema = Context
 
     def get_tools(self):
-        """返回合同审批相关工具"""
+        """返回知识库查询相关工具"""
         base_tools = get_tools()
         base_tools.append(calc_agent_tool)
         return base_tools
@@ -48,7 +48,7 @@ class HtspAgent(BaseAgent):
         # 使用 create_agent 创建智能体，并传入 middleware
         graph = create_agent(
             model=load_chat_model("siliconflow/Qwen/Qwen3-235B-A22B-Instruct-2507"),  # 默认模型，会被 middleware 覆盖
-            tools=self.get_tools(),  # 注册合同审批相关工具
+            tools=self.get_tools(),  # 注册知识库查询相关工具
             middleware=[
                 context_aware_prompt,  # 动态系统提示词
                 inject_attachment_context,  # 附件上下文注入（LangChain 标准中间件）

@@ -1,0 +1,22 @@
+[agent]
+name = "知识库查询助手"
+description = "专门用于查询公司内部知识库的智能助手，支持政策制度、员工手册、流程规范、业务知识等信息查询"
+version = "1.0.0"
+category = "knowledge_management"
+capabilities = ["search", "document_retrieval", "text_analysis"]
+
+[dependencies]
+python = ">=3.8"
+langchain = "*"
+langchain-tools = "*"
+
+[settings]
+default_streaming = false
+max_context_length = 4000
+temperature = 0.7
+
+[metadata]
+created_by = "system"
+created_date = "2024-12-22"
+last_updated = "2024-12-22"
+tags = ["knowledge", "search", "documentation", "internal"]
