@@ -50,3 +50,12 @@ class Context(BaseContext):
             "description": "是否启用流式输出，关闭后将等待完整响应后一次性返回",
         },
     )
+
+    # 思考过程控制
+    show_thinking: bool = field(
+        default=False,
+        metadata={
+            "name": "显示思考过程",
+            "description": "是否显示大模型的思考过程和推理步骤",
+        },
+    )

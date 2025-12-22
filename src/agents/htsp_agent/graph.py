@@ -70,6 +70,9 @@ class HtspAgent(BaseAgent):
         if getattr(context, 'streaming', False):
             # 如果启用了流式输出，回退到原有的流式方法
             async for msg, metadata in self.stream_messages(messages, input_context=input_context):
+                # 如果不显示思考过程，过滤掉思考相关的消息
+                if not getattr(context, 'show_thinking', False) and self._is_thinking_message(msg):
+                    continue
                 yield msg, metadata
             return
         
@@ -80,8 +83,36 @@ class HtspAgent(BaseAgent):
         messages_list = result.get("messages", [])
         for msg in messages_list:
             if hasattr(msg, 'type') and msg.type == 'ai':
+                # 如果不显示思考过程，检查是否为思考消息
+                if not getattr(context, 'show_thinking', False) and self._is_thinking_message(msg):
+                    continue
                 # 返回AI消息和元数据
                 yield msg, {"agent_id": self.id, "non_stream": True}
+
+    def _is_thinking_message(self, msg) -> bool:
+        """判断消息是否为思考过程消息"""
+        if hasattr(msg, 'content') and isinstance(msg.content, str):
+            content = msg.content.lower()
+            # 检查常见的思考过程关键词
+            thinking_keywords = [
+                'let me think', 'let me analyze', 'i need to', 'first, i should',
+                '让我思考', '让我分析', '我需要', '首先', '思考过程',
+                'reasoning', 'analysis', 'step by step', '逐步分析'
+            ]
+            return any(keyword in content for keyword in thinking_keywords)
+        return False
+
+    async def stream_messages(self, messages: list[str], input_context=None, **kwargs):
+        """重写流式消息处理方法，支持思考过程控制"""
+        # 获取上下文配置
+        context = self.context_schema.from_file(module_name=self.module_name, input_context=input_context)
+        
+        # 调用父类的流式处理方法
+        async for msg, metadata in super().stream_messages(messages, input_context=input_context, **kwargs):
+            # 如果不显示思考过程，过滤掉思考相关的消息
+            if not getattr(context, 'show_thinking', False) and self._is_thinking_message(msg):
+                continue
+            yield msg, metadata
 
 
 def main():
