@@ -123,10 +123,44 @@ class KnowledgeRetrieverModel(BaseModel):
 
 
 def get_kb_based_tools() -> list:
-    """获取所有知识库基于的工具"""
+    """获取所有知识库基于的工具 - 增强调试版本"""
     # 获取所有知识库
     kb_tools = []
+    
+    logger.info(f"Getting knowledge base retrievers...")
+    logger.info(f"Available KB instances: {list(knowledge_base.kb_instances.keys())}")
+    logger.info(f"Global databases: {list(knowledge_base.global_databases_meta.keys())}")
+    
     retrievers = knowledge_base.get_retrievers()
+    logger.info(f"Retrieved {len(retrievers)} retrievers: {list(retrievers.keys())}")
+    
+    # 如果没有检索到知识库，尝试强制重新初始化
+    if not retrievers:
+        logger.warning("No retrievers found - attempting to re-initialize knowledge bases")
+        try:
+            # 尝试重新初始化知识库实例
+            knowledge_base._initialize_existing_kbs()
+            retrievers = knowledge_base.get_retrievers()
+            logger.info(f"After re-initialization: {len(retrievers)} retrievers")
+            
+            # 如果仍然没有，尝试手动创建
+            if not retrievers:
+                logger.warning("Still no retrievers - attempting manual creation")
+                for db_id, db_meta in knowledge_base.global_databases_meta.items():
+                    kb_type = db_meta.get("kb_type", "lightrag")
+                    try:
+                        logger.info(f"Creating KB instance for {kb_type} (db: {db_id})")
+                        kb_instance = knowledge_base._get_or_create_kb_instance(kb_type)
+                        if hasattr(kb_instance, 'get_retrievers'):
+                            kb_retrievers = kb_instance.get_retrievers()
+                            retrievers.update(kb_retrievers)
+                            logger.info(f"Added {len(kb_retrievers)} retrievers from {kb_type}")
+                    except Exception as e:
+                        logger.error(f"Failed to create {kb_type} instance (db: {db_id}): {e}")
+                
+        except Exception as e:
+            logger.error(f"Failed to re-initialize knowledge bases: {e}")
+            logger.error(traceback.format_exc())
 
     def _create_retriever_wrapper(db_id: str, retriever_info: dict[str, Any]):
         """创建检索器包装函数的工厂函数，避免闭包变量捕获问题"""

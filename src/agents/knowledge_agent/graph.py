@@ -12,7 +12,7 @@ from src.agents.common.middlewares import (
 from src.agents.common.subagents import calc_agent_tool
 
 from .context import Context
-from .tools import get_tools
+from src.agents.common import get_buildin_tools
 
 
 class KnowledgeAgent(BaseAgent):
@@ -27,8 +27,8 @@ class KnowledgeAgent(BaseAgent):
         self.context_schema = Context
 
     def get_tools(self):
-        """返回知识库查询相关工具"""
-        base_tools = get_tools()
+        """返回知识库查询相关工具 - 使用标准工具体系"""
+        base_tools = get_buildin_tools()  # 使用标准的知识库工具体系
         base_tools.append(calc_agent_tool)
         return base_tools
 

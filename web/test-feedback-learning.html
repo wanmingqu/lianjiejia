@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反馈学习功能测试</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ant-design-vue@4.0.0/dist/reset.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 32px;
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+        }
+        .feedback-card {
+            background: #fafafa;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ff4d4f;
+        }
+        .form-item {
+            margin-bottom: 16px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .btn {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .btn:hover {
+            background: #40a9ff;
+        }
+        .btn-success {
+            background: #52c41a;
+        }
+        .btn-success:hover {
+            background: #73d13d;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        .action-area {
+            background: #f0f9ff;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #bae7ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 反馈学习功能测试</h1>
+        
+        <!-- 模拟反馈展示区域 -->
+        <div class="section">
+            <h2>📋 用户反馈数据（模拟）</h2>
+            <div id="feedback-list">
+                <div class="feedback-card">
+                    <div><strong>用户:</strong> test_user_001</div>
+                    <div><strong>反馈类型:</strong> <span style="color: #ff4d4f;">👎 点踩</span></div>
+                    <div><strong>反馈原因:</strong> 回答不够详细，缺少具体示例和代码演示</div>
+                    <div><strong>原始问题:</strong> 如何使用Python进行数据分析？</div>
+                    <div><strong>AI回答:</strong> 你可以使用pandas库来处理数据。</div>
+                    <div><strong>反馈时间:</strong> 2024-12-22 10:30:00</div>
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-success" onclick="showAddToKbModal(1)">
+                            📚 加入知识库
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="feedback-card">
+                    <div><strong>用户:</strong> test_user_002</div>
+                    <div><strong>反馈类型:</strong> <span style="color: #ff4d4f;">👎 点踩</span></div>
+                    <div><strong>反馈原因:</strong> 回答格式混乱，难以阅读</div>
+                    <div><strong>原始问题:</strong> 解释机器学习的分类算法</div>
+                    <div><strong>AI回答:</strong> 机器学习分类有很多算法比如决策树神经网络支持向量机朴素贝叶斯它们各有特点</div>
+                    <div><strong>反馈时间:</strong> 2024-12-22 11:15:00</div>
+                    <div style="margin-top: 12px;">
+                        <button class="btn btn-success" onclick="showAddToKbModal(2)">
+                            📚 加入知识库
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加到知识库的表单 -->
+        <div class="section action-area" id="add-to-kb-form" style="display: none;">
+            <h2>📚 将反馈添加到知识库</h2>
+            <div class="form-item">
+                <label>目标知识库:</label>
+                <select id="kb-select">
+                    <option value="">请选择知识库</option>
+                    <option value="kb_001">产品文档知识库</option>
+                    <option value="kb_002">技术支持知识库</option>
+                    <option value="kb_003">用户反馈学习库</option>
+                </select>
+            </div>
+            
+            <div class="form-item">
+                <label>文档标题:</label>
+                <input type="text" id="doc-title" placeholder="反馈学习 - 回答格式问题" value="反馈学习 - 回答格式问题">
+            </div>
+            
+            <div class="form-item">
+                <label>标签:</label>
+                <input type="text" id="doc-tags" placeholder="用户反馈,需要改进,格式优化" value="用户反馈,需要改进,格式优化">
+            </div>
+            
+            <div class="form-item">
+                <label>内容预览:</label>
+                <textarea id="doc-content" placeholder="将要添加到知识库的内容..."># 用户反馈学习内容
+
+## 反馈信息
+- 反馈类型: 👎 点踩
+- 反馈时间: 2024-12-22 10:30:00
+- 反馈原因: 回答不够详细，缺少具体示例和代码演示
+
+## 原始用户问题
+```
+如何使用Python进行数据分析？
+```
+
+## 学习要点
+用户对AI的回答不满意，主要问题: 回答不够详细，缺少具体示例和代码演示
+
+### 改进建议:
+- 针对用户的反馈原因优化回答
+- 提供更准确、详细的相关信息
+- 确保回答格式清晰、易于理解
+
+## 标签
+#需要改进, 回答不够详细，缺少具, 智能体_document_agent</textarea>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="btn btn-success" onclick="addToKnowledge()">
+                    ✅ 确认添加
+                </button>
+                <button class="btn" onclick="hideAddToKbModal()" style="background: #ff4d4f;">
+                    ❌ 取消
+                </button>
+            </div>
+        </div>
+
+        <!-- 测试结果展示 -->
+        <div class="section" id="test-results" style="display: none;">
+            <h2>📊 测试结果</h2>
+            <div id="result-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentFeedbackId = null;
+
+        // 模拟反馈数据
+        const feedbackData = {
+            1: {
+                id: 1,
+                user_id: 'test_user_001',
+                rating: 'dislike',
+                reason: '回答不够详细，缺少具体示例和代码演示',
+                question: '如何使用Python进行数据分析？',
+                answer: '你可以使用pandas库来处理数据。',
+                created_at: '2024-12-22 10:30:00'
+            },
+            2: {
+                id: 2,
+                user_id: 'test_user_002', 
+                rating: 'dislike',
+                reason: '回答格式混乱，难以阅读',
+                question: '解释机器学习的分类算法',
+                answer: '机器学习分类有很多算法比如决策树神经网络支持向量机朴素贝叶斯它们各有特点',
+                created_at: '2024-12-22 11:15:00'
+            }
+        };
+
+        function showAddToKbModal(feedbackId) {
+            currentFeedbackId = feedbackId;
+            const feedback = feedbackData[feedbackId];
+            
+            // 根据反馈类型预设内容
+            const title = `反馈学习 - ${feedback.reason.substring(0, 30)}...`;
+            const tags = '用户反馈,需要改进,' + (feedback.reason.includes('格式') ? '格式优化' : '内容优化');
+            
+            // 生成学习内容
+            const content = generateLearningContent(feedback);
+            
+            // 填充表单
+            document.getElementById('doc-title').value = title;
+            document.getElementById('doc-tags').value = tags;
+            document.getElementById('doc-content').value = content;
+            
+            // 显示表单
+            document.getElementById('add-to-kb-form').style.display = 'block';
+        }
+
+        function hideAddToKbModal() {
+            document.getElementById('add-to-kb-form').style.display = 'none';
+            currentFeedbackId = null;
+        }
+
+        function generateLearningContent(feedback) {
+            let content = '# 用户反馈学习内容\n\n';
+            content += '## 反馈信息\n';
+            content += `- 反馈类型: ${feedback.rating === 'dislike' ? '👎 点踩' : '👍 点赞'}\n`;
+            content += `- 反馈时间: ${feedback.created_at}\n`;
+            content += `- 反馈原因: ${feedback.reason}\n\n`;
+            content += '## 原始用户问题\n';
+            content += '```\n' + feedback.question + '\n```\n\n';
+            
+            if (feedback.rating === 'dislike') {
+                content += '## 学习要点\n';
+                content += `用户对AI的回答不满意，主要问题: ${feedback.reason}\n\n`;
+                content += '### 改进建议:\n';
+                content += '- 针对用户的反馈原因优化回答\n';
+                content += '- 提供更准确、详细的相关信息\n';
+                content += '- 确保回答格式清晰、易于理解\n\n';
+            }
+            
+            content += '## 标签\n';
+            const tags = ['需要改进', feedback.reason.substring(0, 20), '智能体_document_agent'];
+            content += tags.map(tag => `#${tag}`).join(', ');
+            
+            return content;
+        }
+
+        function addToKnowledge() {
+            const kbId = document.getElementById('kb-select').value;
+            const title = document.getElementById('doc-title').value;
+            const tags = document.getElementById('doc-tags').value;
+            const content = document.getElementById('doc-content').value;
+            
+            if (!kbId) {
+                alert('请选择目标知识库');
+                return;
+            }
+            
+            if (!content.trim()) {
+                alert('内容不能为空');
+                return;
+            }
+            
+            // 模拟API调用
+            simulateAddToKnowledgeApi({
+                feedback_id: currentFeedbackId,
+                kb_id: kbId,
+                title: title,
+                content: content,
+                tags: tags.split(',').map(tag => tag.trim())
+            });
+        }
+
+        function simulateAddToKnowledgeApi(data) {
+            console.log('📤 发送API请求:', data);
+            
+            // 模拟API响应延迟
+            setTimeout(() => {
+                const response = {
+                    success: true,
+                    message: '反馈内容已成功添加到知识库',
+                    doc_id: 'doc_' + Date.now(),
+                    feedback_id: data.feedback_id,
+                    kb_id: data.kb_id,
+                    title: data.title
+                };
+                
+                console.log('📥 API响应:', response);
+                showTestResults(response);
+                hideAddToKbModal();
+            }, 1000);
+        }
+
+        function showTestResults(response) {
+            const resultsDiv = document.getElementById('test-results');
+            const contentDiv = document.getElementById('result-content');
+            
+            let html = '<div style="background: #f6ffed; padding: 16px; border-radius: 6px; border-left: 4px solid #52c41a;">';
+            html += '<h3>✅ 添加成功！</h3>';
+            html += '<p><strong>消息:</strong> ' + response.message + '</p>';
+            html += '<p><strong>文档ID:</strong> ' + response.doc_id + '</p>';
+            html += '<p><strong>反馈ID:</strong> ' + response.feedback_id + '</p>';
+            html += '<p><strong>知识库ID:</strong> ' + response.kb_id + '</p>';
+            html += '<p><strong>文档标题:</strong> ' + response.title + '</p>';
+            html += '</div>';
+            
+            contentDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+            
+            // 5秒后自动隐藏结果
+            setTimeout(() => {
+                resultsDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 反馈学习功能测试页面已加载');
+            console.log('📋 可用的反馈数据:', Object.keys(feedbackData));
+        });
+    </script>
+</body>
+</html>

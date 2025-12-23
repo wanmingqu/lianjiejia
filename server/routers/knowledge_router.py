@@ -1358,3 +1358,38 @@ async def generate_description(
     except Exception as e:
         logger.error(f"生成描述失败: {e}, {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"生成描述失败: {e}")
+
+
+@knowledge.get("/diagnostic", summary="诊断知识库状态")
+async def diagnostic_knowledge_bases(
+    current_user: User = Depends(get_admin_user)
+):
+    """诊断知识库状态，用于调试工具获取问题"""
+    try:
+        diagnostic = {
+            "global_databases_count": len(knowledge_base.global_databases_meta),
+            "global_databases": list(knowledge_base.global_databases_meta.keys()),
+            "kb_instances": list(knowledge_base.kb_instances.keys()),
+            "kb_instances_count": len(knowledge_base.kb_instances),
+            "retrievers_count": len(knowledge_base.get_retrievers()),
+            "retrievers": list(knowledge_base.get_retrievers().keys()),
+            "databases_detail": {}
+        }
+        
+        # 添加详细的数据库信息
+        for db_id, db_meta in knowledge_base.global_databases_meta.items():
+            diagnostic["databases_detail"][db_id] = {
+                "name": db_meta.get("name", "Unknown"),
+                "kb_type": db_meta.get("kb_type", "Unknown"),
+                "description": db_meta.get("description", ""),
+                "has_instance": db_meta.get("kb_type", "lightrag") in knowledge_base.kb_instances
+            }
+        
+        return diagnostic
+        
+    except Exception as e:
+        logger.error(f"知识库诊断失败: {e}, {traceback.format_exc()}")
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }

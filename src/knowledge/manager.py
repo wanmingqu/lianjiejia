@@ -140,18 +140,35 @@ class KnowledgeBaseManager:
                     logger.warning(f"Failed to normalize database metadata timestamp {meta.get('created_at')!r}: {exc}")
 
     def _initialize_existing_kbs(self):
-        """初始化已存在的知识库实例"""
+        """初始化已存在的知识库实例 - 增强版本"""
         kb_types_in_use = set()
-        for db_meta in self.global_databases_meta.values():
+        kb_details = {}
+        
+        # 收集所有知识库类型和详细信息
+        for db_id, db_meta in self.global_databases_meta.items():
             kb_type = db_meta.get("kb_type", "lightrag")  # 默认为lightrag
             kb_types_in_use.add(kb_type)
+            
+            if kb_type not in kb_details:
+                kb_details[kb_type] = []
+            kb_details[kb_type].append({
+                "db_id": db_id,
+                "name": db_meta.get("name", "Unknown"),
+                "description": db_meta.get("description", "")
+            })
 
+        logger.info(f"Found {len(kb_types_in_use)} knowledge base types: {list(kb_types_in_use)}")
+        
         # 为每种使用中的知识库类型创建实例
         for kb_type in kb_types_in_use:
             try:
+                logger.info(f"Initializing {kb_type} knowledge base for {len(kb_details[kb_type])} databases: {[d['name'] for d in kb_details[kb_type]]}")
                 self._get_or_create_kb_instance(kb_type)
+                logger.info(f"Successfully initialized {kb_type} knowledge base")
             except Exception as e:
                 logger.error(f"Failed to initialize {kb_type} knowledge base: {e}")
+                logger.error(f"Databases affected: {[d['name'] for d in kb_details[kb_type]]}")
+                # 继续尝试初始化其他类型的知识库，不让一个失败影响整体
 
     def _get_or_create_kb_instance(self, kb_type: str) -> KnowledgeBase:
         """
