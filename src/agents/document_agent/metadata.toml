@@ -16,7 +16,7 @@ langchain = "^0.1.0"
 langchain-core = "^0.1.0"
 
 [agent.settings]
-default_streaming = false
+default_streaming = true
 max_context_length = 8000
 temperature = 0.3
 max_tokens = 4000

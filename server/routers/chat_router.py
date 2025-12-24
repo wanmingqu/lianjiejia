@@ -588,8 +588,17 @@ async def chat_agent(
                             module_name=agent.module_name, 
                             input_context=input_context
                         )
-                        is_non_stream = not getattr(agent_config, 'streaming', True)
-                        logger.debug(f"Agent {agent_id} streaming mode: {not is_non_stream}")
+                        streaming_value = getattr(agent_config, 'streaming', True)
+                        # 确保默认值为 True (流式)，并且只有明确设置为 False 时才使用非流式
+                        if streaming_value is None:
+                            streaming_value = True
+                        # 确保布尔值类型正确
+                        if isinstance(streaming_value, str):
+                            streaming_value = streaming_value.lower() in ('true', '1', 'yes', 'on')
+                        elif not isinstance(streaming_value, bool):
+                            streaming_value = bool(streaming_value)
+                        is_non_stream = streaming_value is False  # 明确检查是否为 False
+                        logger.info(f"Agent {agent_id} streaming config: {streaming_value} -> {'non-streaming' if is_non_stream else 'streaming'} mode")
                     except Exception as e:
                         logger.warning(f"Failed to get agent streaming config: {e}")
                 

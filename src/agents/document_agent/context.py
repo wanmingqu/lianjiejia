@@ -176,6 +176,15 @@ class Context(BaseContext):
         "options": ["女声", "男声"]
     }] = field(default="女声")
     
+    # 流式输出控制
+    streaming: bool = field(
+        default=True,
+        metadata={
+            "name": "流式输出",
+            "description": "是否启用流式输出，关闭后将等待完整响应后一次性返回",
+        },
+    )
+    
     # 系统提示模板
     system_prompt_template: str = field(
         default="""你是一个专业的文档撰写助手，具备强大的知识库整合能力。

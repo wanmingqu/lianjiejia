@@ -102,3 +102,12 @@ class DeepContext(BaseContext):
         default=DEEP_PROMPT,
         metadata={"name": "系统提示词", "description": "Deep智能体的角色和行为指导"},
     )
+
+    # 流式输出控制
+    streaming: bool = field(
+        default=True,
+        metadata={
+            "name": "流式输出",
+            "description": "是否启用流式输出，关闭后将等待完整响应后一次性返回",
+        },
+    )

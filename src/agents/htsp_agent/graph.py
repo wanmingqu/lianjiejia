@@ -67,7 +67,7 @@ class HtspAgent(BaseAgent):
         context = self.context_schema.from_file(module_name=self.module_name, input_context=input_context)
         
         # 检查是否启用流式输出
-        if getattr(context, 'streaming', False):
+        if getattr(context, 'streaming', True):
             # 如果启用了流式输出，回退到原有的流式方法
             async for msg, metadata in self.stream_messages(messages, input_context=input_context):
                 # 如果不显示思考过程，过滤掉思考相关的消息

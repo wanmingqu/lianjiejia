@@ -36,3 +36,12 @@ class Context(BaseContext):
         default_factory=list,
         metadata={"name": "MCP服务器", "options": list(MCP_SERVERS.keys()), "description": "MCP服务器列表"},
     )
+
+    # 流式输出控制
+    streaming: bool = field(
+        default=True,
+        metadata={
+            "name": "流式输出",
+            "description": "是否启用流式输出，关闭后将等待完整响应后一次性返回",
+        },
+    )
