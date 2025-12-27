@@ -1043,7 +1043,7 @@ watch(conversations, () => {
 
 .floating-sidebar {
   position: absolute !important;
-  z-index: 100;
+  z-index: 101;
   height: 100%;
   left: 0;
   top: 0;
@@ -1067,7 +1067,6 @@ watch(conversations, () => {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: var(--gray-0);
   position: relative;
   box-sizing: border-box;
   overflow-y: scroll;
